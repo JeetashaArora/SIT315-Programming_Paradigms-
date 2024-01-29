@@ -1,0 +1,39 @@
+//SIT315 (Programming Paradigms)
+//Task M1_T1P
+//Submitted By:- Jeetasha
+//Student ID:- 2210994796
+
+void setup()
+{
+  pinMode(2, OUTPUT);
+  pinMode(6, INPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  //Reading value of Motion Sensor
+  int motionFlag = digitalRead(6);
+  Serial.print("The value of motion flag is : ");
+  Serial.println(motionFlag);
+  if(motionFlag){
+    Serial.println();
+    Serial.println("**************************");
+    Serial.println("Motion Active");
+    Serial.println("LED ON");
+    Serial.println("**************************");
+    //If motion is detected the LED turns ON
+    digitalWrite(2,HIGH);
+    delay(1000);
+  }
+  else{
+    Serial.println();
+    Serial.println("**************************");
+    Serial.println("Motion Inactive");
+    Serial.println("LED OFF");
+    Serial.println("**************************");
+    //If motion is not detected the LED turns OFF
+    digitalWrite(2,LOW);
+    delay(1000);
+  }
+}
