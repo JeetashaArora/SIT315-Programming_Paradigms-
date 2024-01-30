@@ -1,0 +1,23 @@
+//SIT315 (Programming Paradigms)
+//Task M1_T1P
+//Submitted By:- Jeetasha
+//Student ID:- 2210994796
+int ledState=0;
+void motionStateChanged(){
+  ledState=!ledState;
+  Serial.println("Motion State Changed");
+}
+void setup()
+{
+  pinMode(2, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(3),motionStateChanged,CHANGE);
+  Serial.begin(9600);
+}
+void loop()
+{
+  int sensorState = digitalRead(3);
+  Serial.print("Sensor Value : ");
+  Serial.println(sensorState);
+  digitalWrite(2,ledState);
+  delay(1000);
+}
