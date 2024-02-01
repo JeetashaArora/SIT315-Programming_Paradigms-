@@ -1,0 +1,56 @@
+//SIT315 (Programming Paradigms)
+//Task M1_T3C
+//Submitted By:- Jeetasha
+//Student ID:- 2210994796
+
+//Setting the initial states of both LED's as off
+int ledState=0;
+int soilMoistureLed = 0;
+//ISR for change in soil moisture sensor value
+void moistureStateChanged()
+{
+  soilMoistureLed=!soilMoistureLed;
+  Serial.println("=== Soil moisture state changed ===");
+}
+
+//ISR for change in motion sensor value
+void motionStateChanged(){
+  ledState=!ledState;
+  Serial.println("==== Motion State Changed ===");
+}
+//Setup function for configuring 
+//the pins and their modes
+void setup()
+{
+  //Pin numbers 6 and 7 configured as Outputs
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  //Pin numbers 2 and 3 configured as Inputs
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
+  //Creating interrupts for the sensors
+  //If the motion sensor value changes 
+  //motionStateChanged ISR runs
+  attachInterrupt(digitalPinToInterrupt(3),motionStateChanged,CHANGE);
+  //If the soil moisture sensor value changes 
+  //moistureStateChanged ISR runs
+  attachInterrupt(digitalPinToInterrupt(2),moistureStateChanged,HIGH);
+  //Initiating the serial communication 
+  //with baud rate 9600
+  Serial.begin(9600);
+}
+void loop()
+{
+  //Reading the input from PIR motion sensor
+  int sensorState = digitalRead(3);
+  Serial.print("* PIR Motion Sensor Value : ");
+  Serial.println(sensorState);
+ 
+  //Reading the input from Soil Moisture sensor
+  int Moisture_sensorState = digitalRead(2);
+  Serial.print("* Soil Moisture Sensor Value : ");
+  Serial.println(Moisture_sensorState);
+  digitalWrite(6,ledState);
+  digitalWrite(7,soilMoistureLed);
+  delay(2000);
+}
