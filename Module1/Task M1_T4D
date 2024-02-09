@@ -1,0 +1,124 @@
+
+//SIT315 (Programming Paradigms)
+//Task M1_T3C
+//Submitted By:- Jeetasha
+//Student ID:- 2210994796
+
+
+// Declaration of state variables for pins 2, 3, and 4
+volatile int D2_state=0;
+volatile int D3_state=0;
+volatile int D4_state=0;
+volatile int D5_state=0;
+
+// Define the pin for the timer LED
+const int timer_led=PB4;
+
+// Define initial time and compare match value for Timer1
+const uint16_t init_time=0;
+const uint16_t comp_match_value=31250;
+
+// Declaration of state variables for LEDs
+volatile int moisture_led=0;
+volatile int motion_led = 0;
+volatile int moisture_2_led = 0;
+volatile int moisture_3_led = 0;
+
+// Setup function to initialize the system
+void setup()
+{
+  // Set pin D0 as output for Serial communication
+  DDRB|=B00000011;
+  // Set pin for timer LED as output
+  DDRB|=_BV(timer_led);
+  
+  // Configure Timer1
+  TCCR1A=0;
+  // Set Timer1 prescaler to 1024
+  TCCR1B|=_BV(CS12);
+  TCCR1B&= ~_BV(CS11);
+  TCCR1B|=_BV(CS10);
+  
+  // Initialize Timer1 counter and compare match value
+  TCNT1=init_time;
+  OCR1A=comp_match_value;
+  
+  // Enable Timer1 compare match A interrupt
+  TIMSK1|=_BV(OCIE1A);
+  
+  // Configure pins D6, D7, and D8 as outputs
+  DDRD|=B11000000; 
+  // Enable pin change interrupt for group 2
+  PCICR|=B00000100;
+  // Enable interrupts for pins D2, D3, D4 and D5
+  PCMSK2|=B00111100;
+ 
+  // Enable global interrupts
+  sei();
+  // Initialize Serial communication with baud rate 9600
+  Serial.begin(9600);
+}
+
+// Main loop function
+void loop()
+{
+  // Update LEDs based on state variables
+  digitalWrite(6,moisture_led);
+  digitalWrite(7,motion_led);
+  digitalWrite(8,moisture_2_led);
+  digitalWrite(9,moisture_3_led);
+}
+
+// Pin change interrupt for pins D2, D3, and D4
+ISR(PCINT2_vect)
+{
+  // Toggle state and corresponding LED if pin 2 state changes
+  if(digitalRead(2)!=D2_state)
+  {
+    moisture_led=!moisture_led;
+    //Printing the data on serial monitor
+    Serial.print("Moisture State of Arduino 1 changed to :");
+    Serial.println(moisture_led);
+    Serial.println("***************************************");
+    D2_state=!D2_state;
+  }
+  // Toggle state and corresponding LED if pin 3 state changes
+  if(digitalRead(3)!=D3_state)
+  {
+    motion_led=!motion_led;
+    //Printing the data on serial monitor
+    Serial.print("Motion State changed to :");
+    Serial.println(motion_led);
+    Serial.println("***************************************");
+    D3_state=!D3_state;
+  }
+  // Toggle state and corresponding LED if pin 4 state changes
+  if(digitalRead(4)!=D4_state)
+  {
+    moisture_2_led=!moisture_2_led;
+    //Printing the data on serial monitor
+    Serial.print("Moisture State of Arduino 2 changed to :");
+    Serial.println(moisture_2_led);
+    Serial.println("***************************************");
+    D4_state=!D4_state;
+  }
+  // Toggle state and corresponding LED if pin 5 state changes
+  if(digitalRead(5)!=D5_state)
+  {
+    moisture_3_led=!moisture_3_led;
+    //Printing the data on serial monitor
+    Serial.print("Moisture State of 2nd sensor Arduino 2 changed to :");
+    Serial.println(moisture_3_led);
+    Serial.println("***************************************");
+    D5_state=!D5_state;
+  }
+}
+
+// Timer1 compare match A interrupt
+ISR(TIMER1_COMPA_vect)
+{
+  // Reset Timer1 counter to initial value
+  TCNT1=init_time;
+  // Toggle timer LED
+  PORTB^=(1<<timer_led);
+}
